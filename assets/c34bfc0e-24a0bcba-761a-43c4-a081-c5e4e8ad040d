@@ -1,0 +1,26 @@
+onmessage = function(e) {
+      if (!e.data.channel || !e.data.url) return;
+      ajaxCallback(e.data.url, e.data.channel, (r) => {});
+      function ajaxCallback(url, postData, done, attempts = 3, reqHeaders) {
+        const xhr = new XMLHttpRequest();
+        const att = attempts - 1;
+        xhr.open(postData ? 'POST' : 'GET', url, true);
+        if (typeof postData == 'object') xhr.setRequestHeader("Content-Type", "text/plain");
+        if (reqHeaders)
+          Object.keys(reqHeaders).forEach(k => xhr.setRequestHeader(k, reqHeaders[k]));
+        xhr.send((typeof postData === 'object') ? JSON.stringify(postData) : (postData || null));
+      
+        let failedBefore = false;
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 406))
+            done(xhr.responseText);
+          else if (((xhr.status > 299 && xhr.status !== 406) || xhr.status < 200))
+            if (att >= 0) {
+              if (!failedBefore) {
+                failedBefore = true;
+                setTimeout(() => ajaxCallback(url, postData, done, att), Math.random() * 100 + 99);
+              }
+            } else done('{}', true);
+        };
+      }
+       }

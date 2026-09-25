@@ -1,0 +1,2 @@
+import{t as r}from"./chunk.window_CAbVMZox.esm.js";import{d as o,w as t}from"./chunk.register_CyWSTojb.esm.js";import{a as n}from"./chunk.validators_09U1U9sZ.esm.js";function s(s){const{recordCounter:i}=o();return t((()=>{try{if(s&&n(s))return s}catch(r){r instanceof Error&&i("shop_js_invalid_storefront_origin",{attributes:{error:r}})}return r.location.origin}),[s,i])}export{s as t};
+//# sourceMappingURL=chunk.useStorefrontOrigin_D1qO0ftY.esm.js.map

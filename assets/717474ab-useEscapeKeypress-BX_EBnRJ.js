@@ -1,0 +1,1 @@
+import"./compat.module-DgjQivt3.js";import{h as e}from"./browser-BE3HM6MG.js";const n=["Escape","Esc"];function o({onEscapeKeypress:o}){e(()=>{function e(e){n.includes(e.key)&&o()}return document.addEventListener("keydown",e),()=>{document.removeEventListener("keydown",e)}},[o])}export{o as u};

@@ -1,0 +1,1 @@
+import"./compat.module-DgjQivt3.js";import{T as r}from"./ThemeProvider-DPa5nJ-w.js";import{S as e}from"./constants-CSbNCwRn.js";import{x as o,d as s}from"./browser-BE3HM6MG.js";const t=t=>{const{translate:m}=o(r),[a,i]=s(t===e.RetriableServerError?m("settings.login.error.retriable_server_error"):"");return{serverError:a,setServerError:i}};export{t as u};
