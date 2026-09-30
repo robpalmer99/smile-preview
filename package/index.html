@@ -48,6 +48,25 @@
     .row { flex-wrap:wrap; overflow:visible; }
     .row img { height:200px; }
   }
+
+/* Lightbox. Every ad image on this page is a thumbnail of something that has
+   to be judged at full size, and squinting at a 300px carousel frame is how
+   a weak ad gets waved through. */
+img.zoomable{cursor:zoom-in}
+#lb{position:fixed;inset:0;z-index:9999;display:none;align-items:center;
+  justify-content:center;background:rgba(8,8,8,.94);padding:24px;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:100%;width:auto;height:auto;
+  border-radius:8px;box-shadow:0 20px 70px rgba(0,0,0,.7)}
+#lb .cap{position:absolute;left:0;right:0;bottom:16px;text-align:center;
+  color:#B7B1A3;font-size:13px;letter-spacing:.02em;padding:0 24px}
+#lb .x{position:absolute;top:14px;right:20px;color:#fff;font-size:30px;
+  line-height:1;opacity:.75;font-weight:300}
+#lb .nav{position:absolute;top:50%;transform:translateY(-50%);color:#fff;
+  font-size:40px;line-height:1;opacity:.55;padding:20px 16px;cursor:pointer;user-select:none}
+#lb .nav:hover{opacity:1}
+#lb .prev{left:4px} #lb .next{right:4px}
+@media(max-width:700px){#lb .nav{font-size:30px;padding:16px 10px}}
 </style>
 </head>
 <body><div class="wrap">
@@ -75,7 +94,7 @@
   <p class="lead">Produced end-to-end with AI on the rebuilt pipeline — Smile's real label art in
   every product frame, two designed brand voices, captions synced to the word, compliant end cards.
   Re-scripted to a true 20 seconds: hook inside the first two, one idea per cut, locator CTA intact.
-  These are the versions built to run cold on the feed. Generation cost: under $10 each.</p>
+  Twenty seconds is the format — short holds attention in the feed, and it is where the writing has to be sharpest. Generation cost: under $10 each.</p>
   <div class="vids">
     <div class="vid"><span class="tag">Performance · Read the Can · 20s</span><br>
       <video src="video/read-the-can-20s.mp4" controls preload="metadata"></video>
@@ -85,15 +104,6 @@
       <video src="video/john-daly-20s.mp4" controls preload="metadata"></video>
       <p>Golf-Saturday story in the designed "Smile Marcus" voice — real Lemonade Tea Vodka cans
       throughout, closing on the locator CTA.</p></div>
-  </div>
-  <h3 style="color:var(--y);font-size:15px;margin:22px 0 4px">The original long-form spots</h3>
-  <p class="lead">The full-length versions each 20-second cut was built from — the complete argument
-  for retargeting and placements where longer holds.</p>
-  <div class="vids">
-    <div class="vid"><span class="tag">Read the Can · 62s</span><br>
-      <video src="video/read-the-can.mp4" controls preload="metadata"></video></div>
-    <div class="vid"><span class="tag">John Daly · 49s</span><br>
-      <video src="video/john-daly.mp4" controls preload="metadata"></video></div>
   </div>
 </section>
 
@@ -302,4 +312,52 @@ Headline: Read the Can. Ours Says Vodka. · Description: Platinum Medal 2026 · 
   Responsibly · 21+ · Prepared September 2026.
 </footer>
 
-</div></body></html>
+</div><div id="lb" role="dialog" aria-modal="true" aria-label="Enlarged image">
+  <span class="nav prev" aria-label="Previous">&#8249;</span>
+  <img alt="">
+  <span class="nav next" aria-label="Next">&#8250;</span>
+  <span class="x" aria-label="Close">&times;</span>
+  <div class="cap"></div>
+</div>
+<script>
+(function(){
+  // Only the artwork — not the page thumbnails in the panels, which are just
+  // links to the live pages and have nothing to enlarge.
+  var shots = [].slice.call(document.querySelectorAll('section img')).filter(function(i){
+    return !i.closest('.panel');
+  });
+  if(!shots.length) return;
+  var lb = document.getElementById('lb'),
+      big = lb.querySelector('img'),
+      cap = lb.querySelector('.cap'),
+      at = 0;
+  function show(i){
+    at = (i + shots.length) % shots.length;
+    var src = shots[at].getAttribute('src');
+    big.src = src;
+    big.alt = shots[at].alt || '';
+    cap.textContent = (shots[at].alt || src.split('/').pop()) +
+      '   ·   ' + (at+1) + ' / ' + shots.length + '   ·   click anywhere to close';
+    lb.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function hide(){ lb.classList.remove('on'); big.src=''; document.body.style.overflow=''; }
+  shots.forEach(function(img, i){
+    img.classList.add('zoomable');
+    img.addEventListener('click', function(){ show(i); });
+  });
+  lb.addEventListener('click', hide);
+  lb.querySelector('.prev').addEventListener('click', function(e){ e.stopPropagation(); show(at-1); });
+  lb.querySelector('.next').addEventListener('click', function(e){ e.stopPropagation(); show(at+1); });
+  // The image closes too. The caption promises "click anywhere to close", and
+  // there is nothing to zoom further into, so swallowing the click here would
+  // just make the instruction a lie. Only the arrows stop propagation.
+  document.addEventListener('keydown', function(e){
+    if(!lb.classList.contains('on')) return;
+    if(e.key === 'Escape') hide();
+    if(e.key === 'ArrowLeft') show(at-1);
+    if(e.key === 'ArrowRight') show(at+1);
+  });
+})();
+</script>
+</body></html>
