@@ -389,19 +389,17 @@ Headline: Read the Can. Ours Says Vodka. · Description: Platinum Medal 2026 · 
   });
 })();
 </script>
-<div id="fresh" data-build="20261001-152545" style="position:fixed;right:18px;bottom:18px;z-index:200;
-  display:none;background:var(--y);color:#1a1708;font-weight:800;font-size:14px;
-  padding:12px 20px;border-radius:40px;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.5)">
-  Updated &mdash; tap to reload
-</div>
+<!-- pages-fresh:start -->
+<div id="pf-pill" data-build="20261001-154311" style="position:fixed;right:18px;bottom:18px;
+  z-index:2147483000;display:none;background:#FFC72C;color:#1a1708;font-weight:800;
+  font-size:14px;line-height:1;padding:13px 20px;border-radius:40px;cursor:pointer;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  box-shadow:0 8px 30px rgba(0,0,0,.45)">Updated &mdash; tap to reload</div>
 <script>
 (function(){
-  // A tab left open never re-fetches, so it can sit on an old build for days.
-  // Poll a tiny version file; reload silently when the reader comes back to
-  // the tab, and offer a pill rather than yanking the page while they read.
-  var el = document.getElementById('fresh');
-  var mine = el.getAttribute('data-build');
-  var stale = false;
+  var el = document.getElementById('pf-pill');
+  if(!el) return;
+  var mine = el.getAttribute('data-build'), stale = false;
   function check(){
     fetch('version.json?t=' + Date.now(), {cache:'no-store'})
       .then(function(r){ return r.ok ? r.json() : null; })
@@ -415,11 +413,12 @@ Headline: Read the Can. Ours Says Vodka. · Description: Platinum Medal 2026 · 
   el.addEventListener('click', function(){ location.reload(); });
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState !== 'visible') return;
-    if(stale) location.reload();   // they just came back; safe to refresh
+    if(stale) location.reload();   // they just came back, so refreshing is safe
     else check();
   });
   check();
   setInterval(check, 120000);
 })();
 </script>
+<!-- pages-fresh:end -->
 </body></html>

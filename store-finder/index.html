@@ -127,4 +127,36 @@ document.getElementById('nearme').onclick=()=>{
   },()=>{document.getElementById('status').textContent='Location unavailable — search by city or ZIP instead.'},{timeout:8000});
 };
 render(STORES.map(s=>({...s,dist:null})));
-</script></body></html>
+</script><!-- pages-fresh:start -->
+<div id="pf-pill" data-build="20261001-154311" style="position:fixed;right:18px;bottom:18px;
+  z-index:2147483000;display:none;background:#FFC72C;color:#1a1708;font-weight:800;
+  font-size:14px;line-height:1;padding:13px 20px;border-radius:40px;cursor:pointer;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  box-shadow:0 8px 30px rgba(0,0,0,.45)">Updated &mdash; tap to reload</div>
+<script>
+(function(){
+  var el = document.getElementById('pf-pill');
+  if(!el) return;
+  var mine = el.getAttribute('data-build'), stale = false;
+  function check(){
+    fetch('version.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(v){
+        if(!v || !v.build || v.build === mine) return;
+        stale = true;
+        if(document.visibilityState === 'visible') el.style.display = 'block';
+      })
+      .catch(function(){});
+  }
+  el.addEventListener('click', function(){ location.reload(); });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState !== 'visible') return;
+    if(stale) location.reload();   // they just came back, so refreshing is safe
+    else check();
+  });
+  check();
+  setInterval(check, 120000);
+})();
+</script>
+<!-- pages-fresh:end -->
+</body></html>

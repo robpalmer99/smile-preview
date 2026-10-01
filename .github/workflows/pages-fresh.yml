@@ -1,0 +1,39 @@
+# Installed by pages-fresh. Verifies that every page carries the updater and
+# that its build id matches its version.json, so a forgotten stamp shows up as
+# a red tick rather than as a client reading last week's work.
+#
+# Deliberately read-only. An earlier version stamped and committed back, which
+# would have put a bot commit on master after every push and made the next
+# push from another machine fail — exactly the rejected-push-then-rebase-by-
+# hand problem the git rules warn about. CI reports; you and the tool write.
+name: pages-fresh
+on:
+  push:
+    branches: ["**"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check build ids
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re, sys
+          bad = 0
+          for html in sorted(pathlib.Path('.').rglob('*.html')):
+              if '.git' in html.parts:
+                  continue
+              s = html.read_text()
+              if '<!-- pages-fresh:start -->' not in s:
+                  print(f'{html}: no updater block'); bad += 1; continue
+              m = re.search(r'data-build="([^"]*)"', s)
+              vj = html.parent / 'version.json'
+              live = json.loads(vj.read_text())['build'] if vj.exists() else None
+              if not m or not live or m.group(1) != live:
+                  print(f'{html}: build id does not match version.json'); bad += 1
+              else:
+                  print(f'{html}: ok ({live})')
+          if bad:
+              print(f'\n{bad} page(s) stale. Run: pages-fresh <dir>')
+          sys.exit(1 if bad else 0)
+          PY
