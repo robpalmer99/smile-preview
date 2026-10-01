@@ -389,4 +389,37 @@ Headline: Read the Can. Ours Says Vodka. · Description: Platinum Medal 2026 · 
   });
 })();
 </script>
+<div id="fresh" data-build="20261001-152545" style="position:fixed;right:18px;bottom:18px;z-index:200;
+  display:none;background:var(--y);color:#1a1708;font-weight:800;font-size:14px;
+  padding:12px 20px;border-radius:40px;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.5)">
+  Updated &mdash; tap to reload
+</div>
+<script>
+(function(){
+  // A tab left open never re-fetches, so it can sit on an old build for days.
+  // Poll a tiny version file; reload silently when the reader comes back to
+  // the tab, and offer a pill rather than yanking the page while they read.
+  var el = document.getElementById('fresh');
+  var mine = el.getAttribute('data-build');
+  var stale = false;
+  function check(){
+    fetch('version.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(v){
+        if(!v || !v.build || v.build === mine) return;
+        stale = true;
+        if(document.visibilityState === 'visible') el.style.display = 'block';
+      })
+      .catch(function(){});
+  }
+  el.addEventListener('click', function(){ location.reload(); });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState !== 'visible') return;
+    if(stale) location.reload();   // they just came back; safe to refresh
+    else check();
+  });
+  check();
+  setInterval(check, 120000);
+})();
+</script>
 </body></html>
